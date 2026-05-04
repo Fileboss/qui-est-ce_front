@@ -1,0 +1,65 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-2xl mx-auto px-4 py-8">
+
+    <div class="flex items-center gap-4 mb-8">
+      <a routerLink="/" class="text-blue-600 hover:underline text-sm">← Retour</a>
+      <h1 class="text-2xl font-bold text-gray-800">Administration</h1>
+    </div>
+
+    <!-- Create pack form -->
+    <div class="flex gap-2 mb-6">
+      <input
+        type="text"
+        placeholder="Nom du nouveau pack"
+        [value]="newPackName()"
+        (input)="onPackNameChange($event)"
+        (keydown.enter)="createPack()"
+        class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        (click)="createPack()"
+        [disabled]="creating() || !newPackName().trim()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ creating() ? 'Création…' : '+ Nouveau pack' }}
+      </button>
+    </div>
+
+    @if (error()) {
+      <p class="text-red-600 text-sm mb-4">{{ error() }}</p>
+    }
+
+    @if (deleteNotice()) {
+      <p class="text-amber-600 text-sm mb-4 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+        Suppression non disponible pour l'instant.
+      </p>
+    }
+
+    <!-- Pack list -->
+    @if (loading()) {
+      <p class="text-gray-500 text-sm">Chargement…</p>
+    } @else if (packs().length === 0) {
+      <p class="text-gray-400 text-sm">Aucun pack pour l'instant.</p>
+    } @else {
+      <ul class="space-y-2">
+        @for (pack of packs(); track pack.id) {
+          <li class="flex items-center justify-between bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-100">
+            <a
+              [routerLink]="['/admin/packs', pack.id]"
+              class="text-gray-800 font-medium hover:text-blue-600"
+            >
+              {{ pack.name }}
+            </a>
+            <button
+              (click)="deletePack(pack.id)"
+              class="text-sm text-red-500 hover:text-red-700"
+            >
+              Supprimer
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+  </div>
+</div>

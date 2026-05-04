@@ -1,0 +1,24 @@
+<div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
+  <h1 class="text-4xl font-bold text-gray-800 mb-2">Qui est-ce ?</h1>
+  <p class="text-gray-500 mb-12">Choisissez votre mode</p>
+
+  <div class="flex flex-col sm:flex-row gap-6 w-full max-w-2xl">
+    <a
+      routerLink="/admin"
+      class="flex-1 flex flex-col items-center justify-center gap-4 p-10 bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border border-gray-100 text-center no-underline"
+    >
+      <span class="text-6xl">⚙️</span>
+      <h2 class="text-2xl font-semibold text-gray-800">Administration</h2>
+      <p class="text-gray-500 text-sm">Gérez les packs et les cartes du jeu</p>
+    </a>
+
+    <a
+      routerLink="/game"
+      class="flex-1 flex flex-col items-center justify-center gap-4 p-10 bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border border-gray-100 text-center no-underline"
+    >
+      <span class="text-6xl">🎮</span>
+      <h2 class="text-2xl font-semibold text-gray-800">Jouer</h2>
+      <p class="text-gray-500 text-sm">Lancez une partie à deux joueurs</p>
+    </a>
+  </div>
+</div>
