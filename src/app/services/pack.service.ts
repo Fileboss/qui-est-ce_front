@@ -6,7 +6,7 @@ import { CardDTO, PackDto } from '../models/pack.model';
 @Injectable({ providedIn: 'root' })
 export class PackService {
   private readonly http = inject(HttpClient);
-  private readonly base = '';
+  private readonly base = '/api';
 
   getAllPacks(): Observable<PackDto[]> {
     return this.http.get<PackDto[]>(`${this.base}/pack`);

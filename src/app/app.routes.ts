@@ -9,4 +9,8 @@ export const routes: Routes = [
     loadComponent: () => import('./admin/pack-detail/pack-detail').then(m => m.PackDetail),
   },
   { path: 'game', loadComponent: () => import('./game/game').then(m => m.Game) },
+  {
+    path: 'game/:gameId/:player',
+    loadComponent: () => import('./game/player-view/player-view').then(m => m.PlayerView),
+  },
 ];
