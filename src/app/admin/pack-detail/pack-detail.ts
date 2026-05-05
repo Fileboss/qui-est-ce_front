@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PackService } from '../../services/pack.service';
 import { CardDTO } from '../../models/pack.model';
@@ -11,7 +11,6 @@ import { CardDTO } from '../../models/pack.model';
 export class PackDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly packService = inject(PackService);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 
   readonly packId = signal('');
@@ -19,7 +18,6 @@ export class PackDetail implements OnInit {
   readonly loading = signal(false);
   readonly uploading = signal(false);
   readonly error = signal<string | null>(null);
-  readonly deleteNotice = signal(false);
 
   readonly newCardName = signal('');
   readonly newCardFile = signal<File | null>(null);
@@ -77,9 +75,9 @@ export class PackDetail implements OnInit {
   }
 
   deleteCard(id: string): void {
-    this.deleteNotice.set(true);
-    this.packService.deleteCard(id).subscribe();
-    const timer = setTimeout(() => this.deleteNotice.set(false), 3000);
-    this.destroyRef.onDestroy(() => clearTimeout(timer));
+    this.packService.deleteCard(id).subscribe({
+      next: () => this.cards.update(list => list.filter(c => c.id !== id)),
+      error: () => this.error.set('Erreur lors de la suppression de la carte.'),
+    });
   }
 }

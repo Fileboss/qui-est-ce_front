@@ -29,12 +29,6 @@
       <p class="text-red-600 text-sm mb-4">{{ error() }}</p>
     }
 
-    @if (deleteNotice()) {
-      <p class="text-amber-600 text-sm mb-4 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-        Suppression non disponible pour l'instant.
-      </p>
-    }
-
     <!-- Pack list -->
     @if (loading()) {
       <p class="text-gray-500 text-sm">Chargement…</p>

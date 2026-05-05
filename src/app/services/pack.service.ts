@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { EMPTY, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CardDTO, PackDto } from '../models/pack.model';
 
 @Injectable({ providedIn: 'root' })
@@ -18,9 +18,8 @@ export class PackService {
     });
   }
 
-  deletePack(_id: string): Observable<never> {
-    console.warn('TODO: DELETE /pack/:id not yet implemented in the backend');
-    return EMPTY;
+  deletePack(id: string): Observable<unknown> {
+    return this.http.delete(`${this.base}/pack/${id}`);
   }
 
   getCardsByPack(packId: string): Observable<CardDTO[]> {
@@ -35,8 +34,7 @@ export class PackService {
     return this.http.put<CardDTO>(`${this.base}/card/create`, form);
   }
 
-  deleteCard(_id: string): Observable<never> {
-    console.warn('TODO: DELETE /card/:id not yet implemented in the backend');
-    return EMPTY;
+  deleteCard(id: string): Observable<unknown> {
+    return this.http.delete(`${this.base}/card/${id}`);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PackService } from '../services/pack.service';
 import { PackDto } from '../models/pack.model';
@@ -10,14 +10,12 @@ import { PackDto } from '../models/pack.model';
 })
 export class Admin implements OnInit {
   private readonly packService = inject(PackService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly packs = signal<PackDto[]>([]);
   readonly loading = signal(false);
   readonly creating = signal(false);
   readonly newPackName = signal('');
   readonly error = signal<string | null>(null);
-  readonly deleteNotice = signal(false);
 
   ngOnInit(): void {
     this.loadPacks();
@@ -62,9 +60,9 @@ export class Admin implements OnInit {
   }
 
   deletePack(id: string): void {
-    this.deleteNotice.set(true);
-    this.packService.deletePack(id).subscribe();
-    const timer = setTimeout(() => this.deleteNotice.set(false), 3000);
-    this.destroyRef.onDestroy(() => clearTimeout(timer));
+    this.packService.deletePack(id).subscribe({
+      next: () => this.packs.update(list => list.filter(p => p.id !== id)),
+      error: () => this.error.set('Erreur lors de la suppression du pack.'),
+    });
   }
 }
