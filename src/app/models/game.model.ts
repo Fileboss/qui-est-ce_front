@@ -1,3 +1,5 @@
+import { CardDTO } from './pack.model';
+
 export type GameStatus =
   | 'NOT_STARTED'
   | 'PREPARING'
@@ -5,9 +7,13 @@ export type GameStatus =
   | 'PLAYER_1_WINS'
   | 'PLAYER_2_WINS';
 
+export interface GameDTO {
+  gameId: string;
+  gameState: GameStatus;
+  cards: CardDTO[];
+}
+
 export interface GameStatusResponse {
   status: GameStatus;
-  gameId: string;
-  errorMessage: string | null;
-  winner: boolean;
+  correct: boolean;
 }

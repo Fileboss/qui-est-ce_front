@@ -48,15 +48,15 @@
               <span class="text-xs text-gray-400 font-mono">{{ game.gameId }}</span>
               <span
                 class="text-xs font-medium px-2 py-1 rounded-full"
-                [ngClass]="statusBadgeClass(game.status)"
+                [ngClass]="statusBadgeClass(game.gameState)"
               >
-                {{ statusLabel(game.status) }}
+                {{ statusLabel(game.gameState) }}
               </span>
             </div>
 
             <div class="flex flex-col gap-2">
 
-              @if (game.status === 'PREPARING') {
+              @if (game.gameState === 'PREPARING') {
                 <div class="flex gap-2">
                   @if (isJoined(game.gameId, 'player1')) {
                     <a
@@ -102,7 +102,7 @@
                 </div>
               }
 
-              @if (game.status === 'STARTED') {
+              @if (game.gameState === 'STARTED') {
                 <div class="flex gap-2">
                   <a
                     [routerLink]="['/game', game.gameId, 'player1']"
@@ -119,10 +119,10 @@
                 </div>
               }
 
-              @if (game.status === 'PLAYER_1_WINS' || game.status === 'PLAYER_2_WINS') {
+              @if (game.gameState === 'PLAYER_1_WINS' || game.gameState === 'PLAYER_2_WINS') {
                 <div class="flex items-center gap-3">
                   <span class="text-sm font-semibold text-green-700">
-                    🏆 {{ game.status === 'PLAYER_1_WINS' ? 'Joueur 1 a gagné !' : 'Joueur 2 a gagné !' }}
+                    🏆 {{ game.gameState === 'PLAYER_1_WINS' ? 'Joueur 1 a gagné !' : 'Joueur 2 a gagné !' }}
                   </span>
                   <button
                     (click)="resetGame(game.gameId)"

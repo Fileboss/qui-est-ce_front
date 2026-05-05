@@ -23,18 +23,25 @@ components:
         image:
           type: string
           format: binary
+    GameDTO:
+      type: object
+      properties:
+        gameId:
+          type: string
+        gameState:
+          type: string
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/CardDTO"
     GameStatusResponse:
       type: object
       properties:
         status:
           type: string
-        gameId:
-          type: string
-        errorMessage:
-          type: string
-        winner:
+        correct:
           type: boolean
-    PackDto:
+    PackDTO:
       type: object
       properties:
         id:
@@ -60,6 +67,20 @@ paths:
       summary: Create Card
       tags:
         - Card Resource
+  /game:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GameDTO"
+      summary: Get All
+      tags:
+        - Game Resource
   /game/create:
     post:
       parameters:
@@ -73,7 +94,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameStatusResponse"
+                $ref: "#/components/schemas/GameDTO"
       summary: Create Game
       tags:
         - Game Resource
@@ -220,7 +241,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PackDto"
+                  $ref: "#/components/schemas/PackDTO"
       summary: Get All
       tags:
         - Pack Resource
@@ -237,7 +258,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PackDto"
+                $ref: "#/components/schemas/PackDTO"
       summary: Create Pack
       tags:
         - Pack Resource

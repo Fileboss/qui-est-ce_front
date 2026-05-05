@@ -4,7 +4,7 @@ import { NgClass } from '@angular/common';
 import { PackService } from '../services/pack.service';
 import { GameService } from '../services/game.service';
 import { PackDto } from '../models/pack.model';
-import { GameStatus, GameStatusResponse } from '../models/game.model';
+import { GameDTO, GameStatus } from '../models/game.model';
 
 const STATUS_CLASSES: Record<GameStatus, string> = {
   PREPARING: 'bg-amber-100 text-amber-700',
@@ -32,7 +32,7 @@ export class Game implements OnInit {
   private readonly packService = inject(PackService);
   private readonly router = inject(Router);
 
-  readonly games = signal<GameStatusResponse[]>([]);
+  readonly games = signal<GameDTO[]>([]);
   readonly packs = signal<PackDto[]>([]);
   readonly selectedPackId = signal('');
   readonly loading = signal(false);
@@ -110,8 +110,8 @@ export class Game implements OnInit {
     this.startingGameId.set(gameId);
     this.error.set(null);
     this.gameService.startGame(gameId).subscribe({
-      next: updated => {
-        this.games.update(list => list.map(g => g.gameId === gameId ? updated : g));
+      next: () => {
+        this.loadGames();
         this.startingGameId.set(null);
       },
       error: () => {
@@ -135,9 +135,9 @@ export class Game implements OnInit {
   resetGame(gameId: string): void {
     this.error.set(null);
     this.gameService.resetGame(gameId).subscribe({
-      next: updated => {
+      next: () => {
         this.gameService.clearGameCache(gameId);
-        this.games.update(list => list.map(g => g.gameId === gameId ? updated : g));
+        this.loadGames();
       },
       error: () => this.error.set('Erreur lors du redémarrage.'),
     });

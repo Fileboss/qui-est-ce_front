@@ -40,7 +40,7 @@
       }
 
       @if (gameStatus() === 'PLAYER_1_WINS' || gameStatus() === 'PLAYER_2_WINS') {
-        @if (result()?.winner) {
+        @if (result()?.correct) {
           <div class="bg-green-50 border border-green-200 rounded-xl px-5 py-4 mb-6 text-green-800 font-semibold">
             🏆 Bravo, tu as gagné !
           </div>
@@ -52,13 +52,13 @@
       }
 
       @if (gameStatus() === 'STARTED') {
-        @if (result() && !result()!.winner) {
+        @if (result() && !result()!.correct) {
           <div class="bg-red-50 border border-red-200 rounded-xl px-5 py-4 mb-6 text-red-700 text-sm">
             Mauvaise réponse… Réessaie !
           </div>
         }
 
-        @if (!result()?.winner) {
+        @if (!result()?.correct) {
           <!-- Card grid for guessing -->
           <div class="mb-5">
             <p class="text-sm font-semibold text-gray-600 mb-3">Qui est l'adversaire ?</p>

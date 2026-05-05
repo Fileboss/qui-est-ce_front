@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CardDTO } from '../models/pack.model';
-import { GameStatusResponse } from '../models/game.model';
+import { GameDTO, GameStatusResponse } from '../models/game.model';
 
 const cardKey = (gameId: string, player: string) => `qui-est-ce-${gameId}-${player}`;
 
@@ -11,12 +11,12 @@ export class GameService {
   private readonly http = inject(HttpClient);
   private readonly base = '/api';
 
-  getAllGames(): Observable<GameStatusResponse[]> {
-    return this.http.get<GameStatusResponse[]>(`${this.base}/game`);
+  getAllGames(): Observable<GameDTO[]> {
+    return this.http.get<GameDTO[]>(`${this.base}/game`);
   }
 
-  createGame(packId: string): Observable<GameStatusResponse> {
-    return this.http.post<GameStatusResponse>(`${this.base}/game/create`, null, { params: { packId } });
+  createGame(packId: string): Observable<GameDTO> {
+    return this.http.post<GameDTO>(`${this.base}/game/create`, null, { params: { packId } });
   }
 
   deleteGame(gameId: string): Observable<unknown> {

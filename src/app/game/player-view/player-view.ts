@@ -1,12 +1,13 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { GameStatus } from '../../models/game.model';
-
-const TERMINAL_STATUSES = new Set<GameStatus>(['PLAYER_1_WINS', 'PLAYER_2_WINS', 'NOT_STARTED']);
+import { GameStatus, GameStatusResponse } from '../../models/game.model';
 import { GameService } from '../../services/game.service';
 import { PackService } from '../../services/pack.service';
 import { CardDTO } from '../../models/pack.model';
-import { GameStatusResponse } from '../../models/game.model';
+
+
+const TERMINAL_STATUSES = new Set<GameStatus>(['PLAYER_1_WINS', 'PLAYER_2_WINS', 'NOT_STARTED']);
+
 
 @Component({
   selector: 'app-player-view',
@@ -51,8 +52,8 @@ export class PlayerView implements OnInit {
       next: games => {
         const match = games.find(g => g.gameId === gameId);
         if (match) {
-          this.gameStatus.set(match.status);
-          if (!TERMINAL_STATUSES.has(match.status)) this.startPolling(gameId);
+          this.gameStatus.set(match.gameState);
+          if (!TERMINAL_STATUSES.has(match.gameState)) this.startPolling(gameId);
         }
       },
     });
@@ -67,10 +68,10 @@ export class PlayerView implements OnInit {
         next: games => {
           polling = false;
           const match = games.find(g => g.gameId === gameId);
-          if (match && match.status !== this.gameStatus()) {
-            this.gameStatus.set(match.status);
+          if (match && match.gameState !== this.gameStatus()) {
+            this.gameStatus.set(match.gameState);
           }
-          if (!match || TERMINAL_STATUSES.has(match.status)) {
+          if (!match || TERMINAL_STATUSES.has(match.gameState)) {
             clearInterval(id);
           }
         },
@@ -139,7 +140,7 @@ export class PlayerView implements OnInit {
   }
 
   selectCard(cardId: string): void {
-    if (this.result()?.winner) return;
+    if (this.result()?.correct) return;
     this.selectedCardId.set(cardId);
   }
 
@@ -157,7 +158,7 @@ export class PlayerView implements OnInit {
       next: response => {
         this.result.set(response);
         this.gameStatus.set(response.status);
-        if (!response.winner) this.selectedCardId.set(null);
+        if (!response.correct) this.selectedCardId.set(null);
         this.guessing.set(false);
       },
       error: () => {
