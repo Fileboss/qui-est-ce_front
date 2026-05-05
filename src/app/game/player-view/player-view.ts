@@ -1,12 +1,11 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, ActivatedRoute } from '@angular/router';
-import { GameStatus, GameStatusResponse } from '../../models/game.model';
+import { GameStatusResponse } from '../../models/game.model';
 import { GameService } from '../../services/game.service';
+import { GameWebSocketService } from '../../services/game-websocket.service';
 import { PackService } from '../../services/pack.service';
 import { CardDTO } from '../../models/pack.model';
-
-
-const TERMINAL_STATUSES = new Set<GameStatus>(['PLAYER_1_WINS', 'PLAYER_2_WINS', 'NOT_STARTED']);
 
 
 @Component({
@@ -17,6 +16,7 @@ const TERMINAL_STATUSES = new Set<GameStatus>(['PLAYER_1_WINS', 'PLAYER_2_WINS',
 export class PlayerView implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly gameService = inject(GameService);
+  private readonly gameWsService = inject(GameWebSocketService);
   private readonly packService = inject(PackService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -51,34 +51,19 @@ export class PlayerView implements OnInit {
     this.gameService.getAllGames().subscribe({
       next: games => {
         const match = games.find(g => g.gameId === gameId);
-        if (match) {
-          this.gameStatus.set(match.gameState);
-          if (!TERMINAL_STATUSES.has(match.gameState)) this.startPolling(gameId);
-        }
+        if (match) this.gameStatus.set(match.gameState);
       },
     });
-  }
 
-  private startPolling(gameId: string): void {
-    let polling = false;
-    const id = setInterval(() => {
-      if (polling) return;
-      polling = true;
-      this.gameService.getAllGames().subscribe({
-        next: games => {
-          polling = false;
-          const match = games.find(g => g.gameId === gameId);
-          if (match && match.gameState !== this.gameStatus()) {
-            this.gameStatus.set(match.gameState);
-          }
-          if (!match || TERMINAL_STATUSES.has(match.gameState)) {
-            clearInterval(id);
+    this.gameWsService.connectToGame(gameId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: event => {
+          if (event.type === 'STATE_CHANGE' && event.gameState) {
+            this.gameStatus.set(event.gameState);
           }
         },
-        error: () => { polling = false; },
       });
-    }, 3000);
-    this.destroyRef.onDestroy(() => clearInterval(id));
   }
 
   private joinGame(gameId: string, player: 'player1' | 'player2'): void {
@@ -120,8 +105,7 @@ export class PlayerView implements OnInit {
     this.starting.set(true);
     this.error.set(null);
     this.gameService.startGame(this.gameId()).subscribe({
-      next: response => {
-        this.gameStatus.set(response.status);
+      next: () => {
         this.starting.set(false);
       },
       error: () => {
@@ -157,7 +141,6 @@ export class PlayerView implements OnInit {
     guess$.subscribe({
       next: response => {
         this.result.set(response);
-        this.gameStatus.set(response.status);
         if (!response.correct) this.selectedCardId.set(null);
         this.guessing.set(false);
       },

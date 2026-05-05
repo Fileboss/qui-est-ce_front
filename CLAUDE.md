@@ -37,7 +37,28 @@ Backend runs at `http://localhost:8080`. Three resource groups:
 - `POST /game/{gameId}/reset` — restart the same game
 - `DELETE /game/{gameId}` — delete game
 
-Key DTOs: `CardDTO` (`id`, `name`, `imageUrl`, `packId`), `PackDto` (`id`, `name`), `GameStatusResponse` (`status`, `gameId`, `errorMessage`, `winner`).
+Key DTOs: `CardDTO` (`id`, `name`, `imageUrl`, `packId`), `PackDto` (`id`, `name`), `GameDTO` (`gameId`, `gameState`, `cards`), `GameStatusResponse` (`status` — always the string `"Success"`, not a game state; `correct` — boolean result of a guess).
+
+## WebSocket
+
+The backend pushes real-time updates over two WebSocket endpoints (proxied via `/ws` in `proxy.conf.json` → `ws://localhost:8080`):
+
+| Endpoint | Events received |
+|---|---|
+| `ws://…/ws/game/{gameId}` | `STATE_CHANGE` on every state transition; `DELETED` when the game is removed |
+| `ws://…/ws/games` | `GAME_CREATED` and `DELETED` for lobby updates |
+
+**Message shape** (`GameUpdateEvent` in `src/app/models/game.model.ts`):
+```json
+{ "gameId": "…", "type": "STATE_CHANGE", "gameState": "STARTED", "correct": null }
+```
+`correct` is only present (non-null) on guess events; `gameState` is absent on `DELETED`.
+
+On connect, the backend immediately sends the current state: `/ws/game/{gameId}` sends a `STATE_CHANGE` with the live game state; `/ws/games` sends the full games list as a JSON array (not a `GameUpdateEvent` — parse accordingly).
+
+**`GameWebSocketService`** (`src/app/services/game-websocket.service.ts`) — injectable service exposing `connectToGame(gameId)` and `connectToLobby()`, both returning `Observable<GameUpdateEvent>` via `rxjs/webSocket` with a 5-retry backoff.
+
+**Key pattern:** WebSocket is the single authoritative source for `gameStatus` in `player-view`. HTTP guess/start responses are only used for their `correct` field — never call `this.gameStatus.set(response.status)` from HTTP handlers, since the backend always returns `"Success"` as the status string, not an actual game state.
 
 ## Architecture
 

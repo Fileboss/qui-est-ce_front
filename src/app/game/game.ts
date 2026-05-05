@@ -1,8 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { PackService } from '../services/pack.service';
 import { GameService } from '../services/game.service';
+import { GameWebSocketService } from '../services/game-websocket.service';
 import { PackDto } from '../models/pack.model';
 import { GameDTO, GameStatus } from '../models/game.model';
 
@@ -29,8 +31,10 @@ const STATUS_LABELS: Record<GameStatus, string> = {
 })
 export class Game implements OnInit {
   private readonly gameService = inject(GameService);
+  private readonly gameWsService = inject(GameWebSocketService);
   private readonly packService = inject(PackService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly games = signal<GameDTO[]>([]);
   readonly packs = signal<PackDto[]>([]);
@@ -47,6 +51,16 @@ export class Game implements OnInit {
       next: packs => this.packs.set(packs),
       error: () => this.error.set('Impossible de charger les packs.'),
     });
+    this.gameWsService.connectToLobby()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: event => {
+          if (event.type === 'GAME_CREATED') this.loadGames();
+          if (event.type === 'DELETED') {
+            this.games.update(list => list.filter(g => g.gameId !== event.gameId));
+          }
+        },
+      });
   }
 
   loadGames(): void {

@@ -17,3 +17,10 @@ export interface GameStatusResponse {
   status: GameStatus;
   correct: boolean;
 }
+
+export interface GameUpdateEvent {
+  gameId: string;
+  type: 'GAME_CREATED' | 'STATE_CHANGE' | 'DELETED';
+  gameState?: GameStatus;
+  correct?: boolean | null;
+}
