@@ -12,6 +12,16 @@ export class PackService {
     return this.http.get<PackDto[]>(`${this.base}/pack`);
   }
 
+  getPack(id: string): Observable<PackDto> {
+    return this.http.get<PackDto>(`${this.base}/pack/${id}`);
+  }
+
+  updatePack(id: string, name: string): Observable<PackDto> {
+    return this.http.patch<PackDto>(`${this.base}/pack/${id}`, null, {
+      params: { packName: name },
+    });
+  }
+
   createPack(name: string): Observable<PackDto> {
     return this.http.put<PackDto>(`${this.base}/pack/create`, null, {
       params: { packName: name },

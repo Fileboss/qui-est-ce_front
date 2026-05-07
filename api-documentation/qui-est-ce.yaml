@@ -16,9 +16,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CardDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Create Card
       tags:
         - Card Resource
+      security:
+        - SecurityScheme:
+            - admin
   /card/{id}:
     delete:
       parameters:
@@ -34,9 +41,16 @@ paths:
           content:
             application/json:
               schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Delete Card
       tags:
         - Card Resource
+      security:
+        - SecurityScheme:
+            - admin
   /game:
     get:
       responses:
@@ -48,9 +62,15 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/GameDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Get All
       tags:
         - Game Resource
+      security:
+        - SecurityScheme: []
   /game/create:
     post:
       parameters:
@@ -65,9 +85,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Create Game
       tags:
         - Game Resource
+      security:
+        - SecurityScheme:
+            - player
   /game/{gameId}:
     delete:
       parameters:
@@ -82,9 +109,16 @@ paths:
           content:
             application/json:
               schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Delete Game
       tags:
         - Game Resource
+      security:
+        - SecurityScheme:
+            - player
   /game/{gameId}/player1/guess:
     post:
       parameters:
@@ -104,9 +138,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameStatusResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Player 1 Guess
       tags:
         - Game Resource
+      security:
+        - SecurityScheme:
+            - player
   /game/{gameId}/player1/join:
     post:
       parameters:
@@ -122,9 +163,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CardDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Player 1 Join Game
       tags:
         - Game Resource
+      security:
+        - SecurityScheme:
+            - player
   /game/{gameId}/player2/guess:
     post:
       parameters:
@@ -144,9 +192,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameStatusResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Player 2 Guess
       tags:
         - Game Resource
+      security:
+        - SecurityScheme:
+            - player
   /game/{gameId}/player2/join:
     post:
       parameters:
@@ -162,9 +217,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CardDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Player 2 Join Game
       tags:
         - Game Resource
+      security:
+        - SecurityScheme:
+            - player
   /game/{gameId}/reset:
     post:
       parameters:
@@ -180,9 +242,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameStatusResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Reset Game
       tags:
         - Game Resource
+      security:
+        - SecurityScheme:
+            - player
   /game/{gameId}/start:
     post:
       parameters:
@@ -198,9 +267,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GameStatusResponse"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Start Game
       tags:
         - Game Resource
+      security:
+        - SecurityScheme:
+            - player
   /pack:
     get:
       responses:
@@ -212,9 +288,15 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/PackDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Get All
       tags:
         - Pack Resource
+      security:
+        - SecurityScheme: []
   /pack/create:
     put:
       parameters:
@@ -229,10 +311,70 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PackDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Create Pack
       tags:
         - Pack Resource
+      security:
+        - SecurityScheme:
+            - admin
   /pack/{id}:
+    patch:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: packName
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Update Pack
+      tags:
+        - Pack Resource
+      security:
+        - SecurityScheme:
+            - admin
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PackDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Get One
+      tags:
+        - Pack Resource
+      security:
+        - SecurityScheme: []
     delete:
       parameters:
         - name: id
@@ -247,9 +389,16 @@ paths:
           content:
             application/json:
               schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Delete Pack
       tags:
         - Pack Resource
+      security:
+        - SecurityScheme:
+            - admin
   /pack/{id}/cards:
     get:
       parameters:
@@ -267,9 +416,15 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CardDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Get Cards By Pack
       tags:
         - Pack Resource
+      security:
+        - SecurityScheme: []
 components:
   schemas:
     CardDTO:
@@ -318,6 +473,10 @@ components:
           type: string
         name:
           type: string
+  securitySchemes:
+    SecurityScheme:
+      type: openIdConnect
+      description: Authentication
 info:
   title: qui-est-ce_back API
   version: "0.1"

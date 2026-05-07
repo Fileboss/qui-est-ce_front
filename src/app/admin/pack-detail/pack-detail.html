@@ -3,7 +3,46 @@
 
     <div class="flex items-center gap-4 mb-8">
       <a routerLink="/admin" class="text-blue-600 hover:underline text-sm">← Retour</a>
-      <h1 class="text-2xl font-bold text-gray-800">Pack : {{ packId() }}</h1>
+
+      @if (editingName()) {
+        <form class="flex items-center gap-2" (submit)="$event.preventDefault(); saveName()">
+          <input
+            type="text"
+            [value]="editName()"
+            (input)="onEditNameChange($event)"
+            (keydown.escape)="cancelEditName()"
+            class="border border-gray-300 rounded-lg px-3 py-1 text-lg font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autofocus
+          />
+          <button
+            type="submit"
+            [disabled]="renaming() || !editName().trim()"
+            class="text-sm text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50"
+          >
+            {{ renaming() ? 'Enregistrement…' : 'Enregistrer' }}
+          </button>
+          <button
+            type="button"
+            (click)="cancelEditName()"
+            class="text-sm text-gray-500 hover:text-gray-700"
+          >
+            Annuler
+          </button>
+        </form>
+      } @else {
+        <div class="flex items-center gap-2">
+          <h1 class="text-2xl font-bold text-gray-800">
+            {{ pack()?.name ?? packId() }}
+          </h1>
+          <button
+            (click)="startEditName()"
+            aria-label="Renommer le pack"
+            class="text-gray-400 hover:text-gray-600 text-sm"
+          >
+            ✏️
+          </button>
+        </div>
+      }
     </div>
 
     <!-- Upload form -->
@@ -25,6 +64,13 @@
           (change)="onFileChange($event)"
           class="text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
         />
+        @if (previewUrl()) {
+          <img
+            [src]="previewUrl()!"
+            alt="Aperçu"
+            class="w-16 h-16 rounded-lg object-cover border border-gray-200 shrink-0"
+          />
+        }
         <button
           (click)="uploadCard()"
           [disabled]="uploading() || !newCardName().trim() || !newCardFile()"
