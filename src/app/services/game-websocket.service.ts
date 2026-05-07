@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { defer, Observable, switchMap } from 'rxjs';
 import { retry } from 'rxjs/operators';
 import { webSocket } from 'rxjs/webSocket';
-import { GameUpdateEvent } from '../models/game.model';
+import { GameDTO, GameUpdateEvent } from '../models/game.model';
 import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
@@ -23,10 +23,12 @@ export class GameWebSocketService {
     );
   }
 
-  connectToLobby(): Observable<GameUpdateEvent> {
+  connectToLobby(): Observable<GameUpdateEvent | GameDTO[]> {
     return defer(() => this.auth.getValidToken()).pipe(
       switchMap(token =>
-        webSocket<GameUpdateEvent>(`${this.wsBase()}/ws/games?access_token=${token}`),
+        webSocket<GameUpdateEvent | GameDTO[]>(
+          `${this.wsBase()}/ws/games?access_token=${token}`,
+        ),
       ),
       retry({ delay: 2000, count: 5 }),
     );

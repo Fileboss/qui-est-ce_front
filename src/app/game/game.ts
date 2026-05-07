@@ -46,19 +46,28 @@ export class Game implements OnInit {
   readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.loadGames();
-    this.packService.getAllPacks().subscribe({
+    this.loading.set(true);
+    this.packService.getAllPacks().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: packs => this.packs.set(packs),
       error: () => this.error.set('Impossible de charger les packs.'),
     });
     this.gameWsService.connectToLobby()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: event => {
-          if (event.type === 'GAME_CREATED') this.loadGames();
-          if (event.type === 'DELETED') {
-            this.games.update(list => list.filter(g => g.gameId !== event.gameId));
+        next: msg => {
+          if (Array.isArray(msg)) {
+            this.games.set(msg);
+            this.loading.set(false);
+            return;
           }
+          if (msg.type === 'GAME_CREATED') this.loadGames();
+          if (msg.type === 'DELETED') {
+            this.games.update(list => list.filter(g => g.gameId !== msg.gameId));
+          }
+        },
+        error: () => {
+          this.error.set('Impossible de charger les parties.');
+          this.loading.set(false);
         },
       });
   }
@@ -66,7 +75,7 @@ export class Game implements OnInit {
   loadGames(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.gameService.getAllGames().subscribe({
+    this.gameService.getAllGames().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: games => {
         this.games.set(games);
         this.loading.set(false);
@@ -87,7 +96,7 @@ export class Game implements OnInit {
     if (!packId) return;
     this.creating.set(true);
     this.error.set(null);
-    this.gameService.createGame(packId).subscribe({
+    this.gameService.createGame(packId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: game => {
         this.games.update(list => [...list, game]);
         this.selectedPackId.set('');
@@ -107,7 +116,7 @@ export class Game implements OnInit {
       player === 'player1'
         ? this.gameService.joinPlayer1(gameId)
         : this.gameService.joinPlayer2(gameId);
-    join$.subscribe({
+    join$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: card => {
         this.gameService.cacheCard(gameId, player, card);
         this.joining.set(false);
@@ -123,7 +132,7 @@ export class Game implements OnInit {
   startGame(gameId: string): void {
     this.startingGameId.set(gameId);
     this.error.set(null);
-    this.gameService.startGame(gameId).subscribe({
+    this.gameService.startGame(gameId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.loadGames();
         this.startingGameId.set(null);
@@ -137,7 +146,7 @@ export class Game implements OnInit {
 
   deleteGame(gameId: string): void {
     this.error.set(null);
-    this.gameService.deleteGame(gameId).subscribe({
+    this.gameService.deleteGame(gameId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.gameService.clearGameCache(gameId);
         this.games.update(list => list.filter(g => g.gameId !== gameId));
@@ -148,7 +157,7 @@ export class Game implements OnInit {
 
   resetGame(gameId: string): void {
     this.error.set(null);
-    this.gameService.resetGame(gameId).subscribe({
+    this.gameService.resetGame(gameId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.gameService.clearGameCache(gameId);
         this.loadGames();

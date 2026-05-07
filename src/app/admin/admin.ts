@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { PackService } from '../services/pack.service';
 import { PackDto } from '../models/pack.model';
@@ -10,6 +11,7 @@ import { PackDto } from '../models/pack.model';
 })
 export class Admin implements OnInit {
   private readonly packService = inject(PackService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly packs = signal<PackDto[]>([]);
   readonly loading = signal(false);
@@ -24,7 +26,7 @@ export class Admin implements OnInit {
   loadPacks(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.packService.getAllPacks().subscribe({
+    this.packService.getAllPacks().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: packs => {
         this.packs.set(packs);
         this.loading.set(false);
@@ -42,7 +44,7 @@ export class Admin implements OnInit {
 
     this.creating.set(true);
     this.error.set(null);
-    this.packService.createPack(name).subscribe({
+    this.packService.createPack(name).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: pack => {
         this.packs.update(list => [...list, pack]);
         this.newPackName.set('');
@@ -60,7 +62,7 @@ export class Admin implements OnInit {
   }
 
   deletePack(id: string): void {
-    this.packService.deletePack(id).subscribe({
+    this.packService.deletePack(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.packs.update(list => list.filter(p => p.id !== id)),
       error: () => this.error.set('Erreur lors de la suppression du pack.'),
     });

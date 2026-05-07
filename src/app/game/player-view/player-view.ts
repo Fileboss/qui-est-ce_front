@@ -48,13 +48,6 @@ export class PlayerView implements OnInit {
       this.joinGame(gameId, player);
     }
 
-    this.gameService.getAllGames().subscribe({
-      next: games => {
-        const match = games.find(g => g.gameId === gameId);
-        if (match) this.gameStatus.set(match.gameState);
-      },
-    });
-
     this.gameWsService.connectToGame(gameId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -73,7 +66,7 @@ export class PlayerView implements OnInit {
       player === 'player1'
         ? this.gameService.joinPlayer1(gameId)
         : this.gameService.joinPlayer2(gameId);
-    join$.subscribe({
+    join$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: card => {
         this.gameService.cacheCard(gameId, player, card);
         this.secretCard.set(card);
@@ -89,7 +82,7 @@ export class PlayerView implements OnInit {
 
   private loadCards(packId: string): void {
     this.loadingCards.set(true);
-    this.packService.getCardsByPack(packId).subscribe({
+    this.packService.getCardsByPack(packId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: cards => {
         this.allCards.set(cards);
         this.loadingCards.set(false);
@@ -104,7 +97,10 @@ export class PlayerView implements OnInit {
   startGame(): void {
     this.starting.set(true);
     this.error.set(null);
-    this.gameService.startGame(this.gameId()).subscribe({
+    this.gameService
+      .startGame(this.gameId())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => {
         this.starting.set(false);
       },
@@ -138,7 +134,7 @@ export class PlayerView implements OnInit {
       this.player() === 'player1'
         ? this.gameService.guessPlayer1(gameId, cardId)
         : this.gameService.guessPlayer2(gameId, cardId);
-    guess$.subscribe({
+    guess$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => {
         this.result.set(response);
         if (!response.correct) this.selectedCardId.set(null);

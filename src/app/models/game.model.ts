@@ -14,7 +14,7 @@ export interface GameDTO {
 }
 
 export interface GameStatusResponse {
-  status: GameStatus;
+  status: 'Success';
   correct: boolean;
 }
 

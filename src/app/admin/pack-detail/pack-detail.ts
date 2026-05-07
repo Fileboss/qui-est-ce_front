@@ -1,4 +1,5 @@
-import { Component, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, OnInit, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PackService } from '../../services/pack.service';
 import { CardDTO } from '../../models/pack.model';
@@ -11,6 +12,7 @@ import { CardDTO } from '../../models/pack.model';
 export class PackDetail implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly packService = inject(PackService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly fileInput = viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
 
   readonly packId = signal('');
@@ -31,7 +33,10 @@ export class PackDetail implements OnInit {
   loadCards(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.packService.getCardsByPack(this.packId()).subscribe({
+    this.packService
+      .getCardsByPack(this.packId())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: cards => {
         this.cards.set(cards);
         this.loading.set(false);
@@ -59,7 +64,10 @@ export class PackDetail implements OnInit {
 
     this.uploading.set(true);
     this.error.set(null);
-    this.packService.uploadCard(name, this.packId(), file).subscribe({
+    this.packService
+      .uploadCard(name, this.packId(), file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: card => {
         this.cards.update(list => [...list, card]);
         this.newCardName.set('');
@@ -75,7 +83,7 @@ export class PackDetail implements OnInit {
   }
 
   deleteCard(id: string): void {
-    this.packService.deleteCard(id).subscribe({
+    this.packService.deleteCard(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.cards.update(list => list.filter(c => c.id !== id)),
       error: () => this.error.set('Erreur lors de la suppression de la carte.'),
     });

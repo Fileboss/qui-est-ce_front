@@ -100,6 +100,7 @@
 
                     <button
                       (click)="toggleFaceDown(card.id)"
+                      [attr.aria-label]="facedDownIds().has(card.id) ? 'Réafficher la carte' : 'Masquer la carte'"
                       class="absolute top-1 right-1 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center shadow bg-white/80 text-gray-400 hover:bg-red-100 hover:text-red-600 transition-colors"
                     >
                       {{ facedDownIds().has(card.id) ? '↩' : '✕' }}
