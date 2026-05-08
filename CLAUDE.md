@@ -40,6 +40,18 @@ Two endpoints proxied via `/ws`:
 
 **Key pattern:** the WebSocket is the **single authoritative source** for `gameStatus` in `player-view`. HTTP guess/start responses are only used for `correct` — never call `this.gameStatus.set(response.status)` from HTTP handlers (the backend always returns `"Success"`).
 
+## Error handling — backend unreachable
+
+Two failure modes, handled separately:
+
+**1. Keycloak down at startup** — `auth.init()` in `APP_INITIALIZER` would hang forever, leaving a blank page. Fix: `init()` races against a 5 s timeout (`Promise.race`). On failure it sets `AuthService.initFailed = signal(true)` and returns without throwing, so Angular finishes bootstrapping. `app.html` checks that signal and renders `<app-backend-error />` directly (no router involved). The 5 s timeout is a safety net for servers that accept the TCP connection but never respond; for localhost a dead server gives an immediate "connection refused" so the timeout rarely fires in development.
+
+**2. Spring API down during normal use** — `backendErrorInterceptor` (`src/app/interceptors/backend-error.interceptor.ts`) catches any `/api` response with `status === 0` (network error) or `status >= 500` and navigates to `/backend-error`. It skips the redirect if the router is already on that route.
+
+**Loading state** — `index.html` contains a static CSS spinner inside `<app-root>`. Angular replaces it when it bootstraps, so the user always sees a spinner rather than a blank page during the auth init window.
+
+**Retry** — `BackendError` (`src/app/backend-error/`) always calls `window.location.reload()`. This re-runs the full init cycle and works for both failure modes.
+
 ## Architecture
 
 Angular 21 frontend for a two-player "Guess Who?" game. **Standalone components** (no `NgModule`s); entry point `src/main.ts` bootstraps `App` with `appConfig`. Routes in `src/app/app.routes.ts` render in `<router-outlet>`.

@@ -24,4 +24,8 @@ export const routes: Routes = [
     loadComponent: () => import('./game/player-view/player-view').then(m => m.PlayerView),
     canActivate: [playerGuard],
   },
+  {
+    path: 'backend-error',
+    loadComponent: () => import('./backend-error/backend-error').then(m => m.BackendError),
+  },
 ];

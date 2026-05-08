@@ -8,6 +8,7 @@ export class AuthService {
   readonly isAuthenticated = signal(false);
   readonly username = signal<string | null>(null);
   readonly userRoles = signal<string[]>([]);
+  readonly initFailed = signal(false);
 
   constructor() {
     this._kc = new Keycloak({
@@ -18,10 +19,21 @@ export class AuthService {
   }
 
   init(): Promise<boolean> {
-    return this._kc.init({ onLoad: 'login-required', pkceMethod: 'S256' }).then(authenticated => {
-      if (authenticated) this._syncState();
-      return authenticated;
-    });
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('auth timeout')), 5000),
+    );
+    return Promise.race([
+      this._kc.init({ onLoad: 'login-required', pkceMethod: 'S256' }),
+      timeout,
+    ])
+      .then(authenticated => {
+        if (authenticated) this._syncState();
+        return authenticated;
+      })
+      .catch(() => {
+        this.initFailed.set(true);
+        return false;
+      });
   }
 
   async getValidToken(): Promise<string> {

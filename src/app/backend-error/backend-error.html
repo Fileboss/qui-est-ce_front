@@ -1,0 +1,13 @@
+<div class="min-h-screen flex flex-col items-center justify-center gap-6 p-8 text-center">
+  <div class="text-6xl">🛠️</div>
+  <h1 class="text-2xl font-bold">Oups, nous rencontrons un problème</h1>
+  <p class="text-gray-500 max-w-sm">
+    Le serveur est inaccessible. Vérifiez qu'il est bien démarré puis réessayez.
+  </p>
+  <button
+    (click)="retry()"
+    class="px-6 py-2 rounded bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+  >
+    Réessayer
+  </button>
+</div>
