@@ -13,8 +13,8 @@ npx vitest run src/app/app.spec.ts       # Single test file
 
 Contract: **`api-documentation/qui-est-ce.yaml`** (OpenAPI 3.1) — primary reference, re-read when it changes. Backend at `http://localhost:8080`, proxied via `/api` and `/ws` (`proxy.conf.json`).
 
-**Pack** — `GET /pack`, `PUT /pack/create?packName=`, `GET /pack/{id}/cards`.
-**Card** — `PUT /card/create` (multipart: `name`, `packId`, `image`).
+**Pack** — `GET /pack`, `POST /pack/create` (body: `{ packName }`), `PATCH /pack/{id}` (body: `{ packName }`), `DELETE /pack/{id}`, `GET /pack/{id}`, `GET /pack/{id}/cards`.
+**Card** — `POST /card/create` (multipart: `name`, `packId`, `image`), `DELETE /card/{id}`.
 **Game** — `POST /game/create?packId=`, `POST /game/{id}/playerN/join` → `CardDTO`, `POST /game/{id}/start`, `POST /game/{id}/playerN/guess?cardId=` → `GameStatusResponse`, `POST /game/{id}/reset`, `DELETE /game/{id}`.
 
 Key DTOs: `CardDTO` (`id`, `name`, `imageUrl`, `packId`), `PackDto` (`id`, `name`), `GameDTO` (`gameId`, `gameState`, `cards`), `GameStatusResponse` (`status` always `"Success"` — *not* a game state — and `correct` for guesses).

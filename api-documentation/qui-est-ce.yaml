@@ -2,7 +2,7 @@
 openapi: 3.1.0
 paths:
   /card/create:
-    put:
+    post:
       requestBody:
         content:
           multipart/form-data:
@@ -298,12 +298,13 @@ paths:
       security:
         - SecurityScheme: []
   /pack/create:
-    put:
-      parameters:
-        - name: packName
-          in: query
-          schema:
-            type: string
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PackCreateRequest"
+        required: true
       responses:
         "200":
           description: OK
@@ -315,6 +316,8 @@ paths:
           description: Not Authorized
         "403":
           description: Not Allowed
+        "400":
+          description: Bad Request
       summary: Create Pack
       tags:
         - Pack Resource
@@ -330,10 +333,12 @@ paths:
           schema:
             type: integer
             format: int64
-        - name: packName
-          in: query
-          schema:
-            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PackUpdateRequest"
+        required: true
       responses:
         "200":
           description: OK
@@ -466,6 +471,15 @@ components:
           type: string
         correct:
           type: boolean
+    PackCreateRequest:
+      type: object
+      required:
+        - packName
+      properties:
+        packName:
+          type: string
+          pattern: \S
+          maxLength: 128
     PackDTO:
       type: object
       properties:
@@ -473,6 +487,15 @@ components:
           type: string
         name:
           type: string
+    PackUpdateRequest:
+      type: object
+      required:
+        - packName
+      properties:
+        packName:
+          type: string
+          pattern: \S
+          maxLength: 128
   securitySchemes:
     SecurityScheme:
       type: openIdConnect

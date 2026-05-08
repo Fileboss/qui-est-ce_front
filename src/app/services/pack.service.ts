@@ -17,15 +17,11 @@ export class PackService {
   }
 
   updatePack(id: string, name: string): Observable<PackDto> {
-    return this.http.patch<PackDto>(`${this.base}/pack/${id}`, null, {
-      params: { packName: name },
-    });
+    return this.http.patch<PackDto>(`${this.base}/pack/${id}`, { packName: name });
   }
 
   createPack(name: string): Observable<PackDto> {
-    return this.http.put<PackDto>(`${this.base}/pack/create`, null, {
-      params: { packName: name },
-    });
+    return this.http.post<PackDto>(`${this.base}/pack/create`, { packName: name });
   }
 
   deletePack(id: string): Observable<unknown> {
@@ -41,7 +37,7 @@ export class PackService {
     form.append('name', name);
     form.append('packId', packId);
     form.append('image', image);
-    return this.http.put<CardDTO>(`${this.base}/card/create`, form);
+    return this.http.post<CardDTO>(`${this.base}/card/create`, form);
   }
 
   deleteCard(id: string): Observable<unknown> {
