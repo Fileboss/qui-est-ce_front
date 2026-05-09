@@ -1,6 +1,7 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, ActivatedRoute } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { GameStatusResponse } from '../../models/game.model';
 import { GameService } from '../../services/game.service';
 import { GameWebSocketService } from '../../services/game-websocket.service';
@@ -21,7 +22,6 @@ export class PlayerView implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly gameId = signal('');
-  readonly player = signal<'player1' | 'player2'>('player1');
   readonly secretCard = signal<CardDTO | null>(null);
   readonly allCards = signal<CardDTO[]>([]);
   readonly selectedCardId = signal<string | null>(null);
@@ -33,19 +33,25 @@ export class PlayerView implements OnInit {
   readonly starting = signal(false);
   readonly result = signal<GameStatusResponse | null>(null);
   readonly error = signal<string | null>(null);
+  readonly playersJoined = signal<number | null>(null);
+
+  readonly canStart = computed(
+    () => this.gameStatus() === 'PREPARING' && (this.playersJoined() ?? 0) >= 2,
+  );
+  readonly waitingForOpponent = computed(
+    () => this.gameStatus() === 'PREPARING' && (this.playersJoined() ?? 0) < 2,
+  );
 
   ngOnInit(): void {
     const gameId = this.route.snapshot.paramMap.get('gameId') ?? '';
-    const player = (this.route.snapshot.paramMap.get('player') ?? 'player1') as 'player1' | 'player2';
     this.gameId.set(gameId);
-    this.player.set(player);
 
-    const cached = this.gameService.getCachedCard(gameId, player);
+    const cached = this.gameService.getCachedCard(gameId);
     if (cached) {
       this.secretCard.set(cached);
       this.loadCards(cached.packId);
     } else {
-      this.joinGame(gameId, player);
+      this.joinGame(gameId);
     }
 
     this.gameWsService.connectToGame(gameId)
@@ -55,26 +61,30 @@ export class PlayerView implements OnInit {
           if (event.type === 'STATE_CHANGE' && event.gameState) {
             this.gameStatus.set(event.gameState);
           }
+          if (event.playersJoined != null) {
+            this.playersJoined.set(event.playersJoined);
+          }
         },
       });
   }
 
-  private joinGame(gameId: string, player: 'player1' | 'player2'): void {
+  private joinGame(gameId: string): void {
     this.joining.set(true);
     this.error.set(null);
-    const join$ =
-      player === 'player1'
-        ? this.gameService.joinPlayer1(gameId)
-        : this.gameService.joinPlayer2(gameId);
-    join$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.gameService.join(gameId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: card => {
-        this.gameService.cacheCard(gameId, player, card);
+        this.gameService.cacheCard(gameId, card);
         this.secretCard.set(card);
+        this.playersJoined.update(c => c ?? 1);
         this.joining.set(false);
         this.loadCards(card.packId);
       },
-      error: () => {
-        this.error.set('Impossible de rejoindre la partie.');
+      error: (err: HttpErrorResponse) => {
+        this.error.set(
+          err.status === 409
+            ? 'Cette partie est complète.'
+            : 'Impossible de rejoindre la partie.',
+        );
         this.joining.set(false);
       },
     });
@@ -104,8 +114,12 @@ export class PlayerView implements OnInit {
       next: () => {
         this.starting.set(false);
       },
-      error: () => {
-        this.error.set('Erreur lors du démarrage de la partie.');
+      error: (err: HttpErrorResponse) => {
+        this.error.set(
+          err.status === 400
+            ? 'Il faut deux joueurs distincts pour démarrer la partie.'
+            : 'Erreur lors du démarrage de la partie.',
+        );
         this.starting.set(false);
       },
     });
@@ -130,11 +144,7 @@ export class PlayerView implements OnInit {
     if (!cardId || !gameId) return;
     this.guessing.set(true);
     this.error.set(null);
-    const guess$ =
-      this.player() === 'player1'
-        ? this.gameService.guessPlayer1(gameId, cardId)
-        : this.gameService.guessPlayer2(gameId, cardId);
-    guess$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.gameService.guess(gameId, cardId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => {
         this.result.set(response);
         if (!response.correct) this.selectedCardId.set(null);
@@ -145,9 +155,5 @@ export class PlayerView implements OnInit {
         this.guessing.set(false);
       },
     });
-  }
-
-  playerLabel(): string {
-    return this.player() === 'player1' ? 'Joueur 1' : 'Joueur 2';
   }
 }

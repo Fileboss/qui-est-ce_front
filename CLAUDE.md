@@ -15,7 +15,7 @@ Contract: **`api-documentation/qui-est-ce.yaml`** (OpenAPI 3.1) — primary refe
 
 **Pack** — `GET /pack`, `POST /pack/create` (body: `{ packName }`), `PATCH /pack/{id}` (body: `{ packName }`), `DELETE /pack/{id}`, `GET /pack/{id}`, `GET /pack/{id}/cards`.
 **Card** — `POST /card/create` (multipart: `name`, `packId`, `image`), `DELETE /card/{id}`.
-**Game** — `POST /game/create?packId=`, `POST /game/{id}/playerN/join` → `CardDTO`, `POST /game/{id}/start`, `POST /game/{id}/playerN/guess?cardId=` → `GameStatusResponse`, `POST /game/{id}/reset`, `DELETE /game/{id}`.
+**Game** — `POST /game/create?packId=`, `POST /game/{id}/join` → `CardDTO` (identity-based; idempotent; 409 if game full), `POST /game/{id}/start`, `POST /game/{id}/guess?cardId=` → `GameStatusResponse`, `POST /game/{id}/reset`, `DELETE /game/{id}`.
 
 Key DTOs: `CardDTO` (`id`, `name`, `imageUrl`, `packId`), `PackDto` (`id`, `name`), `GameDTO` (`gameId`, `gameState`, `cards`), `GameStatusResponse` (`status` always `"Success"` — *not* a game state — and `correct` for guesses).
 

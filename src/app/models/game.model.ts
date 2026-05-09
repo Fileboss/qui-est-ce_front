@@ -23,4 +23,5 @@ export interface GameUpdateEvent {
   type: 'GAME_CREATED' | 'STATE_CHANGE' | 'DELETED';
   gameState?: GameStatus;
   correct?: boolean | null;
+  playersJoined?: number | null;
 }

@@ -22,19 +22,19 @@ paths:
           description: Not Allowed
       summary: Create Card
       tags:
-        - Card Resource
+      - Card Resource
       security:
-        - SecurityScheme:
-            - admin
+      - SecurityScheme:
+        - admin
   /card/{id}:
     delete:
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
       responses:
         "200":
           description: OK
@@ -47,10 +47,10 @@ paths:
           description: Not Allowed
       summary: Delete Card
       tags:
-        - Card Resource
+      - Card Resource
       security:
-        - SecurityScheme:
-            - admin
+      - SecurityScheme:
+        - admin
   /game:
     get:
       responses:
@@ -68,16 +68,16 @@ paths:
           description: Not Allowed
       summary: Get All
       tags:
-        - Game Resource
+      - Game Resource
       security:
-        - SecurityScheme: []
+      - SecurityScheme: []
   /game/create:
     post:
       parameters:
-        - name: packId
-          in: query
-          schema:
-            type: string
+      - name: packId
+        in: query
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -91,18 +91,18 @@ paths:
           description: Not Allowed
       summary: Create Game
       tags:
-        - Game Resource
+      - Game Resource
       security:
-        - SecurityScheme:
-            - player
+      - SecurityScheme:
+        - player
   /game/{gameId}:
     delete:
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -115,22 +115,22 @@ paths:
           description: Not Allowed
       summary: Delete Game
       tags:
-        - Game Resource
+      - Game Resource
       security:
-        - SecurityScheme:
-            - player
-  /game/{gameId}/player1/guess:
+      - SecurityScheme:
+        - player
+  /game/{gameId}/guess:
     post:
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: cardId
-          in: query
-          schema:
-            type: string
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: cardId
+        in: query
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -142,20 +142,20 @@ paths:
           description: Not Authorized
         "403":
           description: Not Allowed
-      summary: Player 1 Guess
+      summary: Guess
       tags:
-        - Game Resource
+      - Game Resource
       security:
-        - SecurityScheme:
-            - player
-  /game/{gameId}/player1/join:
+      - SecurityScheme:
+        - player
+  /game/{gameId}/join:
     post:
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -167,74 +167,20 @@ paths:
           description: Not Authorized
         "403":
           description: Not Allowed
-      summary: Player 1 Join Game
+      summary: Join Game
       tags:
-        - Game Resource
+      - Game Resource
       security:
-        - SecurityScheme:
-            - player
-  /game/{gameId}/player2/guess:
-    post:
-      parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: cardId
-          in: query
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GameStatusResponse"
-        "401":
-          description: Not Authorized
-        "403":
-          description: Not Allowed
-      summary: Player 2 Guess
-      tags:
-        - Game Resource
-      security:
-        - SecurityScheme:
-            - player
-  /game/{gameId}/player2/join:
-    post:
-      parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CardDTO"
-        "401":
-          description: Not Authorized
-        "403":
-          description: Not Allowed
-      summary: Player 2 Join Game
-      tags:
-        - Game Resource
-      security:
-        - SecurityScheme:
-            - player
+      - SecurityScheme:
+        - player
   /game/{gameId}/reset:
     post:
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -248,18 +194,18 @@ paths:
           description: Not Allowed
       summary: Reset Game
       tags:
-        - Game Resource
+      - Game Resource
       security:
-        - SecurityScheme:
-            - player
+      - SecurityScheme:
+        - player
   /game/{gameId}/start:
     post:
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: gameId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -273,10 +219,10 @@ paths:
           description: Not Allowed
       summary: Start Game
       tags:
-        - Game Resource
+      - Game Resource
       security:
-        - SecurityScheme:
-            - player
+      - SecurityScheme:
+        - player
   /pack:
     get:
       responses:
@@ -294,9 +240,9 @@ paths:
           description: Not Allowed
       summary: Get All
       tags:
-        - Pack Resource
+      - Pack Resource
       security:
-        - SecurityScheme: []
+      - SecurityScheme: []
   /pack/create:
     post:
       requestBody:
@@ -320,19 +266,19 @@ paths:
           description: Bad Request
       summary: Create Pack
       tags:
-        - Pack Resource
+      - Pack Resource
       security:
-        - SecurityScheme:
-            - admin
+      - SecurityScheme:
+        - admin
   /pack/{id}:
     patch:
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
       requestBody:
         content:
           application/json:
@@ -352,18 +298,18 @@ paths:
           description: Not Allowed
       summary: Update Pack
       tags:
-        - Pack Resource
+      - Pack Resource
       security:
-        - SecurityScheme:
-            - admin
+      - SecurityScheme:
+        - admin
     get:
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
       responses:
         "200":
           description: OK
@@ -377,17 +323,17 @@ paths:
           description: Not Allowed
       summary: Get One
       tags:
-        - Pack Resource
+      - Pack Resource
       security:
-        - SecurityScheme: []
+      - SecurityScheme: []
     delete:
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
       responses:
         "200":
           description: OK
@@ -400,18 +346,18 @@ paths:
           description: Not Allowed
       summary: Delete Pack
       tags:
-        - Pack Resource
+      - Pack Resource
       security:
-        - SecurityScheme:
-            - admin
+      - SecurityScheme:
+        - admin
   /pack/{id}/cards:
     get:
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -427,9 +373,9 @@ paths:
           description: Not Allowed
       summary: Get Cards By Pack
       tags:
-        - Pack Resource
+      - Pack Resource
       security:
-        - SecurityScheme: []
+      - SecurityScheme: []
 components:
   schemas:
     CardDTO:
@@ -474,7 +420,7 @@ components:
     PackCreateRequest:
       type: object
       required:
-        - packName
+      - packName
       properties:
         packName:
           type: string
@@ -490,7 +436,7 @@ components:
     PackUpdateRequest:
       type: object
       required:
-        - packName
+      - packName
       properties:
         packName:
           type: string
@@ -504,7 +450,7 @@ info:
   title: qui-est-ce_back API
   version: "0.1"
 servers:
-  - url: http://localhost:8080
-    description: Auto generated value
-  - url: http://0.0.0.0:8080
-    description: Auto generated value
+- url: http://localhost:8080
+  description: Auto generated value
+- url: http://0.0.0.0:8080
+  description: Auto generated value

@@ -20,7 +20,7 @@ export const routes: Routes = [
     canActivate: [playerGuard],
   },
   {
-    path: 'game/:gameId/:player',
+    path: 'game/:gameId',
     loadComponent: () => import('./game/player-view/player-view').then(m => m.PlayerView),
     canActivate: [playerGuard],
   },

@@ -58,37 +58,20 @@
 
               @if (game.gameState === 'PREPARING') {
                 <div class="flex gap-2">
-                  @if (isJoined(game.gameId, 'player1')) {
+                  @if (isJoined(game.gameId)) {
                     <a
-                      [routerLink]="['/game', game.gameId, 'player1']"
+                      [routerLink]="['/game', game.gameId]"
                       class="flex-1 text-center bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-100"
                     >
-                      Reprendre J1
+                      Reprendre
                     </a>
                   } @else {
                     <button
-                      (click)="joinPlayer(game.gameId, 'player1')"
+                      (click)="join(game.gameId)"
                       [disabled]="joining()"
                       class="flex-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Rejoindre J1
-                    </button>
-                  }
-
-                  @if (isJoined(game.gameId, 'player2')) {
-                    <a
-                      [routerLink]="['/game', game.gameId, 'player2']"
-                      class="flex-1 text-center bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-100"
-                    >
-                      Reprendre J2
-                    </a>
-                  } @else {
-                    <button
-                      (click)="joinPlayer(game.gameId, 'player2')"
-                      [disabled]="joining()"
-                      class="flex-1 bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Rejoindre J2
+                      Rejoindre
                     </button>
                   }
 
@@ -104,18 +87,16 @@
 
               @if (game.gameState === 'STARTED') {
                 <div class="flex gap-2">
-                  <a
-                    [routerLink]="['/game', game.gameId, 'player1']"
-                    class="flex-1 text-center bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-100"
-                  >
-                    Vue Joueur 1
-                  </a>
-                  <a
-                    [routerLink]="['/game', game.gameId, 'player2']"
-                    class="flex-1 text-center bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-100"
-                  >
-                    Vue Joueur 2
-                  </a>
+                  @if (isJoined(game.gameId)) {
+                    <a
+                      [routerLink]="['/game', game.gameId]"
+                      class="flex-1 text-center bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-100"
+                    >
+                      Voir ma partie
+                    </a>
+                  } @else {
+                    <span class="text-sm text-gray-400">Partie en cours</span>
+                  }
                 </div>
               }
 

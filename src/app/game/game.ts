@@ -2,6 +2,7 @@ import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, Router } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { PackService } from '../services/pack.service';
 import { GameService } from '../services/game.service';
 import { GameWebSocketService } from '../services/game-websocket.service';
@@ -109,21 +110,21 @@ export class Game implements OnInit {
     });
   }
 
-  joinPlayer(gameId: string, player: 'player1' | 'player2'): void {
+  join(gameId: string): void {
     this.joining.set(true);
     this.error.set(null);
-    const join$ =
-      player === 'player1'
-        ? this.gameService.joinPlayer1(gameId)
-        : this.gameService.joinPlayer2(gameId);
-    join$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    this.gameService.join(gameId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: card => {
-        this.gameService.cacheCard(gameId, player, card);
+        this.gameService.cacheCard(gameId, card);
         this.joining.set(false);
-        this.router.navigate(['/game', gameId, player]);
+        this.router.navigate(['/game', gameId]);
       },
-      error: () => {
-        this.error.set('Erreur lors de la connexion au jeu.');
+      error: (err: HttpErrorResponse) => {
+        this.error.set(
+          err.status === 409
+            ? 'Cette partie est complète.'
+            : 'Erreur lors de la connexion au jeu.',
+        );
         this.joining.set(false);
       },
     });
@@ -137,8 +138,12 @@ export class Game implements OnInit {
         this.loadGames();
         this.startingGameId.set(null);
       },
-      error: () => {
-        this.error.set('Erreur lors du démarrage de la partie.');
+      error: (err: HttpErrorResponse) => {
+        this.error.set(
+          err.status === 400
+            ? 'Il faut deux joueurs distincts pour démarrer la partie.'
+            : 'Erreur lors du démarrage de la partie.',
+        );
         this.startingGameId.set(null);
       },
     });
@@ -166,8 +171,8 @@ export class Game implements OnInit {
     });
   }
 
-  isJoined(gameId: string, player: 'player1' | 'player2'): boolean {
-    return this.gameService.getCachedCard(gameId, player) !== null;
+  isJoined(gameId: string): boolean {
+    return this.gameService.getCachedCard(gameId) !== null;
   }
 
   statusBadgeClass(status: GameStatus): string {

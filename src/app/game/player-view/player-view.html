@@ -3,7 +3,7 @@
 
     <div class="flex items-center gap-4 mb-8">
       <a routerLink="/game" class="text-blue-600 hover:underline text-sm">← Retour</a>
-      <h1 class="text-2xl font-bold text-gray-800">{{ playerLabel() }}</h1>
+      <h1 class="text-2xl font-bold text-gray-800">Ma partie</h1>
     </div>
 
     @if (error()) {
@@ -28,10 +28,15 @@
 
       @if (gameStatus() === 'PREPARING') {
         <div class="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6 flex items-center justify-between">
-          <span class="text-sm text-amber-700">En attente de démarrage…</span>
+          <div class="flex flex-col gap-0.5">
+            <span class="text-sm text-amber-700">
+              {{ waitingForOpponent() ? 'En attente du second joueur…' : 'En attente de démarrage…' }}
+            </span>
+            <span class="text-xs text-amber-600">{{ playersJoined() ?? '?' }}/2 joueurs prêts</span>
+          </div>
           <button
             (click)="startGame()"
-            [disabled]="starting()"
+            [disabled]="starting() || !canStart()"
             class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ starting() ? 'Démarrage…' : 'Démarrer la partie' }}
@@ -46,7 +51,7 @@
           </div>
         } @else {
           <div class="bg-red-50 border border-red-200 rounded-xl px-5 py-4 mb-6 text-red-700 font-semibold">
-            😢 {{ gameStatus() === 'PLAYER_1_WINS' ? 'Joueur 1' : 'Joueur 2' }} a gagné !
+            😢 L'adversaire a gagné !
           </div>
         }
       }
