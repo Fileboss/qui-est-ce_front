@@ -43,7 +43,6 @@ export class Game implements OnInit {
   readonly loading = signal(false);
   readonly creating = signal(false);
   readonly joining = signal(false);
-  readonly startingGameId = signal<string | null>(null);
   readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
@@ -126,25 +125,6 @@ export class Game implements OnInit {
             : 'Erreur lors de la connexion au jeu.',
         );
         this.joining.set(false);
-      },
-    });
-  }
-
-  startGame(gameId: string): void {
-    this.startingGameId.set(gameId);
-    this.error.set(null);
-    this.gameService.startGame(gameId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => {
-        this.loadGames();
-        this.startingGameId.set(null);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.error.set(
-          err.status === 400
-            ? 'Il faut deux joueurs distincts pour démarrer la partie.'
-            : 'Erreur lors du démarrage de la partie.',
-        );
-        this.startingGameId.set(null);
       },
     });
   }

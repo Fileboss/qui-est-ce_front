@@ -74,14 +74,6 @@
                       Rejoindre
                     </button>
                   }
-
-                  <button
-                    (click)="startGame(game.gameId)"
-                    [disabled]="startingGameId() === game.gameId"
-                    class="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {{ startingGameId() === game.gameId ? 'Démarrage…' : 'Démarrer' }}
-                  </button>
                 </div>
               }
 

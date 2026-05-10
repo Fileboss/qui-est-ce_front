@@ -15,6 +15,11 @@ export const routes: Routes = [
     canActivate: [adminGuard],
   },
   {
+    path: 'admin/users',
+    loadComponent: () => import('./admin/admin-users/admin-users').then(m => m.AdminUsers),
+    canActivate: [adminGuard],
+  },
+  {
     path: 'game',
     loadComponent: () => import('./game/game').then(m => m.Game),
     canActivate: [playerGuard],

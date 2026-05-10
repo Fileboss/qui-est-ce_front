@@ -1,6 +1,121 @@
 ---
 openapi: 3.1.0
+components:
+  schemas:
+    CardDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        imageUrl:
+          type: string
+        packId:
+          type: string
+    CardUploadForm:
+      type: object
+      properties:
+        name:
+          type: string
+        packId:
+          type: string
+        image:
+          type: string
+          format: binary
+    GameDTO:
+      type: object
+      properties:
+        gameId:
+          type: string
+        gameState:
+          type: string
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/CardDTO"
+    GameStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        correct:
+          type: boolean
+    PackCreateRequest:
+      type: object
+      required:
+      - packName
+      properties:
+        packName:
+          type: string
+          pattern: \S
+          maxLength: 128
+    PackDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    PackUpdateRequest:
+      type: object
+      required:
+      - packName
+      properties:
+        packName:
+          type: string
+          pattern: \S
+          maxLength: 128
+    UserCreateRequest:
+      type: object
+      required:
+      - username
+      - password
+      - role
+      properties:
+        username:
+          type: string
+          pattern: \S
+          minLength: 3
+          maxLength: 30
+        password:
+          type: string
+          pattern: \S
+          minLength: 12
+        role:
+          type: string
+          pattern: ^(player|admin)$
+  securitySchemes:
+    SecurityScheme:
+      type: openIdConnect
+      description: Authentication
 paths:
+  /admin/users:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+        "400":
+          description: Bad Request
+      summary: Create User
+      tags:
+      - Admin Resource
+      security:
+      - SecurityScheme:
+        - admin
   /card/create:
     post:
       requestBody:
@@ -376,76 +491,6 @@ paths:
       - Pack Resource
       security:
       - SecurityScheme: []
-components:
-  schemas:
-    CardDTO:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        imageUrl:
-          type: string
-        packId:
-          type: string
-    CardUploadForm:
-      type: object
-      properties:
-        name:
-          type: string
-        packId:
-          type: string
-        image:
-          type: string
-          format: binary
-    GameDTO:
-      type: object
-      properties:
-        gameId:
-          type: string
-        gameState:
-          type: string
-        cards:
-          type: array
-          items:
-            $ref: "#/components/schemas/CardDTO"
-    GameStatusResponse:
-      type: object
-      properties:
-        status:
-          type: string
-        correct:
-          type: boolean
-    PackCreateRequest:
-      type: object
-      required:
-      - packName
-      properties:
-        packName:
-          type: string
-          pattern: \S
-          maxLength: 128
-    PackDTO:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-    PackUpdateRequest:
-      type: object
-      required:
-      - packName
-      properties:
-        packName:
-          type: string
-          pattern: \S
-          maxLength: 128
-  securitySchemes:
-    SecurityScheme:
-      type: openIdConnect
-      description: Authentication
 info:
   title: qui-est-ce_back API
   version: "0.1"
