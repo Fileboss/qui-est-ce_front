@@ -41,15 +41,6 @@ components:
           type: string
         correct:
           type: boolean
-    PackCreateRequest:
-      type: object
-      required:
-      - packName
-      properties:
-        packName:
-          type: string
-          pattern: \S
-          maxLength: 128
     PackDTO:
       type: object
       properties:
@@ -57,7 +48,7 @@ components:
           type: string
         name:
           type: string
-    PackUpdateRequest:
+    PackRequest:
       type: object
       required:
       - packName
@@ -80,7 +71,7 @@ components:
           maxLength: 30
         password:
           type: string
-          pattern: \S
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$"
           minLength: 12
         role:
           type: string
@@ -364,7 +355,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PackCreateRequest"
+              $ref: "#/components/schemas/PackRequest"
         required: true
       responses:
         "200":
@@ -398,7 +389,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PackUpdateRequest"
+              $ref: "#/components/schemas/PackRequest"
         required: true
       responses:
         "200":
