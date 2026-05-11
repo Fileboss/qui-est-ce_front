@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import Keycloak from 'keycloak-js';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -12,7 +13,7 @@ export class AuthService {
 
   constructor() {
     this._kc = new Keycloak({
-      url: 'http://localhost:8180',
+      url: environment.keycloakUrl,
       realm: 'qui-est-ce',
       clientId: 'qui-est-ce-front',
     });
