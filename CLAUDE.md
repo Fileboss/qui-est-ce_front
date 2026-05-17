@@ -36,7 +36,7 @@ Two endpoints proxied via `/ws`:
 
 **On connect**, the backend immediately pushes current state: `/ws/game/{id}` → a `STATE_CHANGE`; `/ws/games` → the full games list as a JSON array (not a `GameUpdateEvent` — parse accordingly).
 
-**Auth.** The token is appended as `?access_token=<jwt>` (browsers can't set headers on `WebSocket`). The backend uses a `@RouteFilter` to promote it into a Bearer header — see backend `CLAUDE.md` / README. **`AuthService.getValidToken()`** refreshes if expiry < 30s; `GameWebSocketService` calls it via `defer(...)` so each (re)subscription gets a fresh token. 5-retry backoff via rxjs.
+**Auth.** Browsers can't set headers on the `WebSocket` API, so the token is passed via two subprotocols: `bearer-token-carrier` and `quarkus-http-upgrade#Authorization#Bearer <jwt>` (URI-encoded via `encodeURIComponent`). The backend (Quarkus `websockets-next` with `propagate-subprotocol-headers=true`) strips the encoded one into an `Authorization` header before OIDC runs and echoes `bearer-token-carrier` back to complete the handshake. **`AuthService.getValidToken()`** refreshes if expiry < 30s; `GameWebSocketService` calls it via `defer(...)` so each (re)subscription rebuilds the subprotocol with a fresh token. 5-retry backoff via rxjs.
 
 **Key pattern:** the WebSocket is the **single authoritative source** for `gameStatus` in `player-view`. HTTP guess/start responses are only used for `correct` — never call `this.gameStatus.set(response.status)` from HTTP handlers (the backend always returns `"Success"`).
 
